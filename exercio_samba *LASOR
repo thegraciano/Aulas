@@ -1,0 +1,68 @@
+1) Instalar o samba:
+# apt install samba
+
+2) Certifique-se de te adicionado usuários no Linux:
+# adduser usuario1
+# adduser usuario2
+# adduser usuario3
+
+3) Crie três diretórios para cada usuário (não se esqueça de atribuir as permissões):
+# cd /
+# mkdir compartilhamento
+# cd compartilhamento
+# mkdir publica
+# cd publica
+# mkdir teste1 teste2 teste3 teste12 teste23
+# chown -R usuario1:usuario1 teste1
+# chown -R usuario2:usuario2 teste2
+# chown -R usuario3:usuario3 teste3
+
+4) A pasta teste12 terá o usuario1 como dono e a pasta teste23 terá o usuario3 como dono.
+O usuario2 terá acesso ao grupo do usuario1 e ao grupo do usuario3.
+# chown -R usuario1:usuario1 teste12
+# chown -R usuario3:usuario3 teste23
+# addgroup usuario2 usuario1
+# addgroup usuario2 usuario3
+
+5) Faça um backup do arquivo /etc/samba/smb.conf:
+# cd /etc/samba
+# mv smb.conf smb.conf.bkp 
+
+6) Crie um arquivo de configuração smb.conf e salve as configurações:
+# vi smb.conf
+#Configurações globais
+[publica]
+ path = /compartilhamento/publica
+ browseable = yes
+ writable = yes
+ read only = no
+[global]
+ workgroup = lasor
+ netbios name = servidor01
+ map to guest = Bad User
+ 
+7) Adicione os usuários ao samba:
+# smbpasswd -a usuario1
+# smbpasswd -a usuario2
+# smbpasswd -a usuario3
+
+8) Reinicie os serviços:
+# service smbd restart
+# service nmbd restart
+
+9) Como perceberam, o usuario2 tem um certo privilégio de acesso em certas pastas.
+Acesse o diretório administrado pelo samba, por meio da máquina virtual Windows 7.
+Certifique-se que as duas máquinas estejam na mesma rede. Para acessar o diretório
+correspondente, digite na barra de endereço do Windows explorer:
+\\192.168.0.1
+Este é o IP do servidor de compartilhamento de arquivos SAMBA.
+
+10) Dicas extras:
+Adicionar usuários ao samba:
+#smbpasswd -a username
+Remover usuários do samba:
+#smbpasswd -x username
+Listar usuários do samba:
+#pdbedit -L -v
+Ou
+#pdbedit -L -v | grep username
